@@ -5,6 +5,7 @@ export const OBS_STREAM_STOPPED_EVENT_ID = "stream-stopped";
 export const OBS_RECORDING_STARTED_EVENT_ID = "recording-started";
 export const OBS_RECORDING_STOPPED_EVENT_ID = "recording-stopped";
 export const OBS_SCENE_ITEM_ENABLE_STATE_CHANGED_EVENT_ID = "scene-item-enable-state-changed";
+export const OBS_SCENE_ITEM_LIST_REINDEXED_EVENT_ID = "scene-item-list-reindexed";
 export const OBS_SCENE_TRANSITION_STARTED_EVENT_ID = "scene-transition-started";
 export const OBS_SCENE_TRANSITION_ENDED_EVENT_ID = "scene-transition-ended";
 export const OBS_CURRENT_PROGRAM_SCENE_CHANGED_EVENT_ID = "current-program-scene-changed";

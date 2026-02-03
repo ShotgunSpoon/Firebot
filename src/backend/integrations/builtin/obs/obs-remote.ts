@@ -12,6 +12,7 @@ import {
     OBS_REPLAY_BUFFER_SAVED_EVENT_ID,
     OBS_SCENE_CHANGED_EVENT_ID,
     OBS_SCENE_ITEM_ENABLE_STATE_CHANGED_EVENT_ID,
+    OBS_SCENE_ITEM_LIST_REINDEXED_EVENT_ID,
     OBS_SCENE_TRANSITION_ENDED_EVENT_ID,
     OBS_SCENE_TRANSITION_STARTED_EVENT_ID,
     OBS_STREAM_STARTED_EVENT_ID,
@@ -528,6 +529,14 @@ async function setupRemoteListeners() {
                 groupInfos[gidx].scenes[sidx].itemId = gis.id;
             }
         });
+
+        eventManager.triggerEvent(
+            OBS_EVENT_SOURCE_ID,
+            OBS_SCENE_ITEM_LIST_REINDEXED_EVENT_ID,
+            {
+                sceneName
+            }
+        );
     });
 
     obs.on("StudioModeStateChanged", async ({ studioModeEnabled }) => {

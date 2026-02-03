@@ -13,6 +13,7 @@ import {
     OBS_REPLAY_BUFFER_SAVED_EVENT_ID,
     OBS_SCENE_CHANGED_EVENT_ID,
     OBS_SCENE_ITEM_ENABLE_STATE_CHANGED_EVENT_ID,
+    OBS_SCENE_ITEM_LIST_REINDEXED_EVENT_ID,
     OBS_SCENE_TRANSITION_ENDED_EVENT_ID,
     OBS_SCENE_TRANSITION_STARTED_EVENT_ID,
     OBS_STREAM_STARTED_EVENT_ID,
@@ -90,6 +91,14 @@ export const OBSEventSource: EventSource = {
                 groupName: "Test Group Name",
                 sceneItemEnabled: true,
                 sceneItemId: -1,
+                sceneName: "Test Scene Name"
+            }
+        },
+        {
+            id: OBS_SCENE_ITEM_LIST_REINDEXED_EVENT_ID,
+            name: "OBS Scene Item List Reindexed",
+            description: "When the items in a scene have been re-ordered",
+            manualMetadata: {
                 sceneName: "Test Scene Name"
             }
         },
