@@ -29,7 +29,8 @@ import {
     OBS_INPUT_AUDIO_BALANCE_CHANGED_EVENT_ID,
     OBS_INPUT_AUDIO_SYNC_OFFSET_CHANGED_EVENT_ID,
     OBS_INPUT_AUDIO_MONITOR_TYPE_CHANGED_EVENT_ID,
-    OBS_INPUT_AUDIO_TRACKS_CHANGED_EVENT_ID
+    OBS_INPUT_AUDIO_TRACKS_CHANGED_EVENT_ID,
+    OBS_EXITING_EVENT_ID
 } from "../constants";
 
 export const OBSEventSource: EventSource = {
@@ -288,6 +289,11 @@ export const OBSEventSource: EventSource = {
                     value: "OBS_MONITORING_TYPE_NONE"
                 }
             }
+        },
+        {
+            id: OBS_EXITING_EVENT_ID,
+            name: "OBS Exiting",
+            description: "When OBS signals that it is exiting/closing"
         }
     ]
 };

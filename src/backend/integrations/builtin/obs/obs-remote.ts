@@ -30,7 +30,8 @@ import {
     OBS_INPUT_AUDIO_MONITOR_TYPE_CHANGED_EVENT_ID,
     OBS_INPUT_AUDIO_TRACKS_CHANGED_EVENT_ID,
     OBS_CONNECTED_EVENT_ID,
-    OBS_DISCONNECTED_EVENT_ID
+    OBS_DISCONNECTED_EVENT_ID,
+    OBS_EXITING_EVENT_ID
 } from "./constants";
 import logger from "../../../logwrapper";
 
@@ -399,6 +400,14 @@ async function setupRemoteListeners() {
                 inputUuid,
                 monitorType
             }
+        );
+    });
+
+    obs.on("ExitStarted", () => {
+        eventManager?.triggerEvent(
+            OBS_EVENT_SOURCE_ID,
+            OBS_EXITING_EVENT_ID,
+            { }
         );
     });
 
