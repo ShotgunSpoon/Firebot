@@ -166,13 +166,6 @@ export async function whenReady() {
     const webhookConfigManager = (await import("../../../webhooks/webhook-config-manager")).default;
     webhookConfigManager.loadItems();
 
-    windowManagement.updateSplashScreenStatus("Loading overlay widgets...");
-    const { loadWidgetTypes } = await import("../../../overlay-widgets/builtin-widget-type-loader");
-    loadWidgetTypes();
-
-    const overlayWidgetConfigManager = (await import("../../../overlay-widgets/overlay-widget-config-manager")).default;
-    overlayWidgetConfigManager.loadItems();
-
     windowManagement.updateSplashScreenStatus("Loading startup script data...");
     const startupScriptsManager = await import("../../../common/handlers/custom-scripts/startup-scripts-manager");
     startupScriptsManager.loadStartupConfig();
@@ -282,9 +275,6 @@ export async function whenReady() {
 
     // start crowbar relay websocket
     await import("../../../crowbar-relay/crowbar-relay-websocket");
-
-    const countdownManager = (await import("../../../overlay-widgets/builtin-types/countdown/countdown-manager")).default;
-    countdownManager.startTimer();
 
     logger.debug("...loading main window");
     windowManagement.updateSplashScreenStatus("Here we go!");

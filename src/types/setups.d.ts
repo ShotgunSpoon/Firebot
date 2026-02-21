@@ -4,7 +4,6 @@ import type { Currency } from "./currency";
 import type { EffectQueueConfig, PresetEffectList } from "./effects";
 import type { EventGroup, EventSettings } from "./events";
 import type { FirebotHotkey } from "./hotkeys";
-import type { OverlayWidgetConfig } from "./overlay-widgets";
 import type { QuickActionDefinition } from "./quick-actions";
 import type { RankLadder } from "./ranks";
 import type { CustomRole, LegacyCustomRole } from "./roles";
@@ -43,7 +42,6 @@ export type FirebotSetup = {
         viewerRoles: (LegacyCustomRole | CustomRole)[];
         viewerRankLadders: RankLadder[];
         quickActions: QuickActionDefinition[];
-        overlayWidgetConfigs: OverlayWidgetConfig[];
         globalValues: FirebotSetupGlobalValue[];
     };
 };

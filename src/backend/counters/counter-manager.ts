@@ -5,13 +5,10 @@ import sanitizeFileName from "sanitize-filename";
 import type { Counter } from "../../types/counters";
 import type { EffectList } from "../../types/effects";
 import type { Trigger } from "../../types/triggers";
-import type { CounterDisplayWidgetConfig } from "../overlay-widgets/builtin-types/counter-display/counter-display-types";
-
 import { AccountAccess } from "../common/account-access";
 import { ProfileManager } from "../common/profile-manager";
 import JsonDbManager from "../database/json-db-manager";
 import effectRunner from "../common/effect-runner";
-import overlayWidgetConfigManager from "../overlay-widgets/overlay-widget-config-manager";
 import frontendCommunicator from "../common/frontend-communicator";
 import logger from "../logwrapper";
 
@@ -70,17 +67,8 @@ class CounterManager extends JsonDbManager<Counter> {
         return result;
     }
 
-    private _updateCounterWidgets(counter: Counter): void {
-        const counterWidgets = overlayWidgetConfigManager.getConfigsOfType<CounterDisplayWidgetConfig>("firebot:counter-display");
-
-        for (const widget of counterWidgets) {
-            if (widget.settings.counterId === counter.id) {
-                overlayWidgetConfigManager.setWidgetStateById(widget.id, {
-                    counterName: counter.name,
-                    counterValue: counter.value
-                }, false);
-            }
-        }
+    private _updateCounterWidgets(_counter: Counter): void {
+        // Overlay widget update removed in accessible fork
     }
 
     triggerUiRefresh(): void {

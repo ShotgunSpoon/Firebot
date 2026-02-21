@@ -8,7 +8,6 @@ exports.loadEffects = () => {
         'activity-feed-alert',
         'add-quote',
         'api',
-        'celebration',
         'chat-feed-alert',
         'chat-feed-custom-highlight',
         'chat-feed-message-hide',
@@ -19,7 +18,7 @@ exports.loadEffects = () => {
         'conditional-effects/conditional-effects',
         'conditional-effects/switch-statement',
         'comment',
-        'control-emulation', // No migration needed.
+        'control-emulation',
         'cooldown-command',
         'copy-to-clipboard',
         'currency',
@@ -31,7 +30,6 @@ exports.loadEffects = () => {
         'effect-group',
         'eval-js',
         'file-writer',
-        'html',
         'http-request',
         'log-message',
         'loop-effects',
@@ -42,10 +40,7 @@ exports.loadEffects = () => {
         'moderator-timeout',
         'pause-resume-effect-queue',
         'play-sound',
-        'play-video', // No migration needed.
-        'overlay-alert',
         'random-effect',
-        'random-reddit-image',
         'remove-user-metadata',
         'reset-timer',
         'retrigger-last-activity',
@@ -55,32 +50,21 @@ exports.loadEffects = () => {
         'sequential-effect',
         'set-output',
         'set-user-metadata',
-        'shoutout',
-        'show-image', // No migration needed.
-        'show-text',
         'show-toast',
         'stop-effect-execution',
         'sync-profile-data',
-        'take-screenshot',
         'text-to-speech',
         'toggle-command',
         'toggle-connection',
         'toggle-event-set',
         'toggle-event',
-        'toggle-overlay-widgets',
         'toggle-scheduled-task',
         'toggle-timer',
         'trigger-manual-effect-queue',
         'update-channel-reward',
         'update-counter',
         'update-role',
-        'update-viewer-rank',
-
-        'overlay-widgets/update-overlay-widget-settings',
-        'overlay-widgets/update-progress-bar',
-        'overlay-widgets/update-dynamic-countdown',
-        'overlay-widgets/set-custom-widget-state',
-        'overlay-widgets/send-message-to-custom-widget'
+        'update-viewer-rank'
     ].forEach((filename) => {
         const definition = require(`./builtin/${filename}`);
         EffectManager.registerEffect(definition);

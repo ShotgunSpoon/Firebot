@@ -7,11 +7,9 @@ import path from 'path';
 
 import { Awaitable } from "../types/util-types";
 import { SettingsManager } from "../backend/common/settings-manager";
-import { EffectManager } from "../backend/effects/effect-manager";
 import { ResourceTokenManager } from "../backend/resource-token-manager";
 import websocketServerManager from "./websocket-server-manager";
 import { CustomWebSocketHandler } from "../types/websocket";
-import overlayWidgetManager from "../backend/overlay-widgets/overlay-widgets-manager";
 import logger from "../backend/logwrapper";
 
 import * as dataAccess from "../backend/common/data-access";
@@ -48,9 +46,7 @@ class HttpServerManager extends EventEmitter {
     serverInstances: ServerInstance[];
     defaultServerInstance: Express;
     defaultHttpServer: http.Server;
-    overlayServer: http.Server;
     isDefaultServerStarted: boolean;
-    overlayHasClients: boolean;
     customRouteRouter: Router;
     customRoutes: CustomRoute[];
 
@@ -60,9 +56,7 @@ class HttpServerManager extends EventEmitter {
         this.serverInstances = [];
         this.defaultServerInstance = null;
         this.defaultHttpServer = null;
-        this.overlayServer = null;
         this.isDefaultServerStarted = false;
-        this.overlayHasClients = false;
         this.customRoutes = [];
         this.setMaxListeners(0);
 
@@ -71,9 +65,8 @@ class HttpServerManager extends EventEmitter {
     }
 
     start(): void {
-        // Default overlay server is already running.
-        if (this.overlayServer != null) {
-            logger.error("Overlay server is already running... is another instance running?");
+        if (this.isDefaultServerStarted) {
+            logger.error("Web server is already running... is another instance running?");
             return;
         }
 
@@ -109,65 +102,6 @@ class HttpServerManager extends EventEmitter {
         app.get('/loginsuccess', (_, res) => {
             res.sendFile(path.join(`${__dirname}/loginsuccess.html`));
         });
-
-
-        // Set up route to serve overlay
-        app.use("/overlay/", express.static(path.join(cwd, './resources/overlay/')));
-        app.get("/overlay/", (req, res) => {
-            const effectDefs = EffectManager.getEffectOverlayExtensions();
-
-            const widgetExtensions = overlayWidgetManager.getOverlayExtensions();
-
-            const combinedCssDeps = [...new Set(
-                [...effectDefs
-                    .filter(ed => ed.dependencies?.css?.length)
-                    .map(ed => ed.dependencies.css),
-                ...widgetExtensions
-                    .filter(we => we.dependencies?.css?.length)
-                    .map(we => we.dependencies.css)
-                ].flat())];
-
-            const combinedJsDeps = [...new Set([
-                ...effectDefs
-                    .filter(ed => ed.dependencies?.js?.length)
-                    .map(ed => ed.dependencies.js),
-                ...widgetExtensions
-                    .filter(we => we.dependencies?.js?.length)
-                    .map(we => we.dependencies.js)
-            ].flat())];
-
-            const combinedGlobalStyles = [
-                ...effectDefs
-                    .filter(ed => ed.dependencies?.globalStyles?.length)
-                    .map(ed => ed.dependencies.globalStyles),
-                ...widgetExtensions
-                    .filter(we => we.dependencies?.globalStyles?.length)
-                    .map(we => we.dependencies.globalStyles)
-            ];
-
-            const widgetEvents: Array<{ name: string, callback: Function }> = [];
-            for (const widgetExtension of widgetExtensions) {
-                if (widgetExtension.eventHandler) {
-                    widgetEvents.push({
-                        name: `overlay-widget:${widgetExtension.typeId}`,
-                        callback: widgetExtension.eventHandler
-                    });
-                }
-            }
-
-            const overlayTemplate = path.join(cwd, './resources/overlay');
-            res.render(overlayTemplate, {
-                effectEvents: effectDefs.map(ed => ed.event),
-                widgetEvents: widgetEvents,
-                widgetInitCallbacks: widgetExtensions.filter(we => we.onInitialLoad).map(we => ({ typeId: we.typeId, callback: we.onInitialLoad })),
-                dependencies: {
-                    css: combinedCssDeps,
-                    js: combinedJsDeps,
-                    globalStyles: combinedGlobalStyles
-                }
-            });
-        });
-        app.use("/overlay-resources", express.static(dataAccess.getPathInUserData("/overlay-resources")));
 
         // Set up resource endpoint
         app.get("/resource/:token", (req, res) => {
@@ -216,29 +150,19 @@ class HttpServerManager extends EventEmitter {
 
         websocketServerManager.createServer(this.defaultHttpServer);
 
-        // Shim for any consumers of the EventEmitter
-
-        websocketServerManager.on("overlay-connected", (instanceName: string) => {
-            this.emit("overlay-connected", instanceName);
-        });
-
-        websocketServerManager.on("overlay-event", (event: unknown) => {
-            this.emit("overlay-event", event);
-        });
-
         try {
             // According to typescript and the documentation, this should not be possible. But it clearly works in the bot
             // @ts-expect-error TS2769
-            this.overlayServer = this.defaultHttpServer.listen(port, ["0.0.0.0", "::"], () => {
+            const server = this.defaultHttpServer.listen(port, ["0.0.0.0", "::"], () => {
                 this.isDefaultServerStarted = true;
 
                 this.serverInstances.push({
                     name: "Default",
                     port: port,
-                    server: this.overlayServer
+                    server: server
                 });
 
-                const addressInfo = this.overlayServer.address();
+                const addressInfo = server.address();
                 logger.info(`Default web server started, listening on port ${typeof addressInfo === 'string' ? addressInfo : addressInfo.port}`);
             });
         } catch (error) {
@@ -246,20 +170,17 @@ class HttpServerManager extends EventEmitter {
         }
     }
 
-    sendToOverlay(eventName: string, meta: Record<string, unknown> = {}, overlayInstance: string = null) {
-        websocketServerManager.sendToOverlay(eventName, meta, overlayInstance);
+    // Overlay methods stubbed out - overlay system removed in accessible fork
+    sendToOverlay(_eventName: string, _meta: Record<string, unknown> = {}, _overlayInstance: string = null) {
+        // No-op: overlay system removed
     }
 
     refreshAllOverlays() {
-        websocketServerManager.refreshAllOverlays();
+        // No-op: overlay system removed
     }
 
-    /**
-     * Refresh a specific overlay instance
-     * @param overlayInstance the instance to refresh, leave undefined to refresh default
-     */
-    refreshOverlayInstance(overlayInstance?: string) {
-        websocketServerManager.sendToOverlay("OVERLAY:REFRESH", undefined, overlayInstance);
+    refreshOverlayInstance(_overlayInstance?: string) {
+        // No-op: overlay system removed
     }
 
     triggerCustomWebSocketEvent(eventType: string, payload: object) {
@@ -290,8 +211,8 @@ class HttpServerManager extends EventEmitter {
                 server: newHttpServer
             });
 
-            const addressInfo = this.overlayServer.address();
-            logger.info(`Default web server started, listening on port ${typeof addressInfo === 'string' ? addressInfo : addressInfo.port}`);
+            const addressInfo = newHttpServer.address();
+            logger.info(`Web server instance "${name}" started, listening on port ${typeof addressInfo === 'string' ? addressInfo : addressInfo.port}`);
             return newHttpServer;
         } catch (error) {
             logger.error(`Unable to start web server instance "${name}" on port ${port}: ${error}`);
@@ -538,7 +459,7 @@ setInterval(() => websocketServerManager.reportClientsToFrontend(manager.isDefau
 
 frontendCommunicator.on("getOverlayStatus", () => {
     return {
-        clientsConnected: websocketServerManager.overlayHasClients,
+        clientsConnected: false,
         serverStarted: manager.isDefaultServerStarted
     };
 });

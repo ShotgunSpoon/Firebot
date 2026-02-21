@@ -19,10 +19,7 @@ export async function ensureRequiredFoldersExist(): Promise<void> {
     //create the root "firebot-data" folder
     await dataAccess.createFirebotDataDir();
 
-    // copy over overlay wrapper
-    dataAccess.copyResourceToUserData(null, "overlay.html", "");
-
-    const requiredRootDirPaths = ["/profiles", "/backups", "/clips", "/overlay-resources"];
+    const requiredRootDirPaths = ["/profiles", "/backups", "/clips"];
     for (const path of requiredRootDirPaths) {
         await ensureDirExists(path);
     }

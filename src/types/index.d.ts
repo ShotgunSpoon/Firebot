@@ -16,7 +16,6 @@ export * from "./import";
 export * from "./integrations";
 export * from "./moderation";
 export * from "./modules";
-export * from "./overlay-widgets";
 export * from "./parameters";
 export * from "./quick-actions";
 export * from "./quotes";

@@ -2,12 +2,9 @@ import { EventEmitter } from "events";
 import http from "http";
 import WebSocket from "ws";
 
-import type { OverlayConnectedData, Message, ResponseMessage, EventMessage, InvokePluginMessage, CustomWebSocketHandler } from "../types/websocket";
-import type { EffectType } from "../types/effects";
+import type { Message, ResponseMessage, EventMessage, InvokePluginMessage, CustomWebSocketHandler } from "../types/websocket";
 
 import { WebSocketClient } from "./websocket-client";
-import { EffectManager } from "../backend/effects/effect-manager";
-import { EventManager } from "../backend/events/event-manager";
 import frontendCommunicator from "../backend/common/frontend-communicator";
 import logger from "../backend/logwrapper";
 
@@ -77,27 +74,6 @@ class WebSocketServerManager extends EventEmitter {
 
                                     break;
                                 }
-                                case "overlay-connected": {
-                                    if (ws.type != null) {
-                                        sendError(ws, message.id, "socket already subscribed");
-                                        break;
-                                    }
-
-                                    clearTimeout(ws.registrationTimeout);
-                                    ws.type = "overlay";
-
-                                    logger.info(`Websocket Overlay Connection from ${req.socket.remoteAddress}`);
-
-                                    sendResponse(ws, message.id);
-
-                                    const instanceName = (message.data as Array<OverlayConnectedData>)[0].instanceName;
-                                    void EventManager.triggerEvent("firebot", "overlay-connected", {
-                                        instanceName
-                                    });
-                                    this.emit("overlay-connected", instanceName);
-
-                                    break;
-                                }
                                 case "plugin": {
                                     const pluginName = (message as InvokePluginMessage).pluginName;
                                     if (pluginName == null || pluginName === "") {
@@ -121,18 +97,6 @@ class WebSocketServerManager extends EventEmitter {
                             }
                             break;
                         }
-                        case "event": {
-                            if (message.name !== "overlay-event") {
-                                break;
-                            }
-
-                            if (ws.type !== "overlay") {
-                                break;
-                            }
-
-                            this.emit("overlay-event", message.data);
-                            break;
-                        }
                         case "response":
                         default: {
                             break;
@@ -143,56 +107,19 @@ class WebSocketServerManager extends EventEmitter {
                 }
             });
         });
-
-        EffectManager.on("effectRegistered", (effect: EffectType) => {
-            if (effect.overlayExtension) {
-                // tell the overlay to refresh because a new effect with an overlay extension has been registered
-                this.refreshAllOverlays();
-            }
-        });
-
-        EffectManager.on("effectUnregistered", ({ hasOverlayEffect }) => {
-            if (hasOverlayEffect) {
-                // tell the overlay to refresh because a effect with an overlay extension has been removed
-                this.refreshAllOverlays();
-            }
-        });
     }
 
-    sendToOverlay(eventName: string, meta: Record<string, unknown> = {}, overlayInstance: string = null) {
-        if (this.server == null || eventName == null) {
-            return;
-        }
-
-        const data = { event: eventName, meta: meta, overlayInstance: overlayInstance };
-
-        const message: EventMessage = {
-            type: "event",
-            name: "send-to-overlay",
-            data
-        };
-
-        const dataRaw = JSON.stringify(message);
-
-        this.server.clients.forEach(function each(client) {
-            if (client.readyState !== 1 || client.type !== "overlay") {
-                return;
-            }
-
-            client.send(dataRaw, (err) => {
-                if (err) {
-                    logger.error(err.message);
-                }
-            });
-        });
+    // Overlay methods stubbed out - overlay system removed in accessible fork
+    sendToOverlay(_eventName: string, _meta: Record<string, unknown> = {}, _overlayInstance: string = null) {
+        // No-op: overlay system removed
     }
 
-    sendWidgetEventToOverlay(event: WidgetOverlayEvent) {
-        this.sendToOverlay("OVERLAY:WIDGET-EVENT", { event }, event.data.widgetConfig.overlayInstance ?? null);
+    sendWidgetEventToOverlay(_event: unknown) {
+        // No-op: overlay system removed
     }
 
     refreshAllOverlays() {
-        this.sendToOverlay("OVERLAY:REFRESH", { global: true });
+        // No-op: overlay system removed
     }
 
     triggerEvent(eventType: string, payload: unknown) {
@@ -222,25 +149,15 @@ class WebSocketServerManager extends EventEmitter {
     }
 
     reportClientsToFrontend(isDefaultServerStarted: boolean) {
-        let hasClients = this.server != null;
-        if (hasClients) {
-            hasClients = [...this.server.clients].filter(client => client.type === "overlay").length > 0;
-        }
-        if (hasClients !== this.overlayHasClients) {
-            frontendCommunicator.send("overlayStatusUpdate", {
-                clientsConnected: hasClients,
-                serverStarted: isDefaultServerStarted
-            });
-            this.overlayHasClients = hasClients;
-        }
+        // Overlay client tracking removed - always report no overlay clients
+        frontendCommunicator.send("overlayStatusUpdate", {
+            clientsConnected: false,
+            serverStarted: isDefaultServerStarted
+        });
     }
 
     getNumberOfOverlayClients(): number {
-        if (this.server == null) {
-            return 0;
-        }
-
-        return [...this.server.clients].filter(client => client.type === "overlay").length;
+        return 0;
     }
 
     registerCustomWebSocketListener(pluginName: string, callback: CustomWebSocketHandler["callback"]): boolean {

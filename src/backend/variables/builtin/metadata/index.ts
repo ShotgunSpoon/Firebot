@@ -10,7 +10,6 @@ import effectQueueLength from './effect-queue-length';
 import effectQueueName from './effect-queue-name';
 import effectQueueStatus from './effect-queue-status';
 import eventData from "./event-data";
-import overlayInstance from './overlay-instance';
 import presetListArg from './preset-list-arg';
 import scanWholeMessage from "./scan-whole-message";
 import target from './target';
@@ -39,7 +38,6 @@ export default [
     effectQueueName,
     effectQueueStatus,
     eventData,
-    overlayInstance,
     presetListArg,
     scanWholeMessage,
     target,

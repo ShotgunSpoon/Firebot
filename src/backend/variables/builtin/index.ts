@@ -10,7 +10,6 @@ import miscVariables from './misc';
 import numberVariables from './number';
 import objectVariables from './object';
 import operandVariables from './operand';
-import overlayWidgets from './overlay-widgets';
 import spoofedVariables from './spoofed';
 import textVariables from './text';
 import userVariables from './user';
@@ -32,6 +31,5 @@ export default [
     ...spoofedVariables,
     ...textVariables,
     ...userVariables,
-    ...utilityVariables,
-    ...overlayWidgets
+    ...utilityVariables
 ];

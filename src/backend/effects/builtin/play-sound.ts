@@ -144,62 +144,6 @@ const model: EffectType<{
             audioOutputDevice: effect.audioOutputDevice,
             waitForSound: effect.waitForSound
         });
-    },
-    /**
-   * Code to run in the overlay
-   */
-    overlayExtension: {
-        dependencies: {
-            css: [],
-            js: []
-        },
-        event: {
-            name: "sound",
-            onOverlayEvent: (event) => {
-                const data = event;
-                const token = encodeURIComponent(data.resourceToken);
-                const resourcePath = `http://${
-                    window.location.hostname
-                }:7472/resource/${token}`;
-
-                // Generate UUID to use as class name.
-
-                const elementId = uuid() as string;
-
-                const filepath = data.isUrl ? data.url : data.filepath.toLowerCase();
-                let mediaType: string | null = null;
-                if (filepath.endsWith("mp3")) {
-                    mediaType = "audio/mpeg";
-                } else if (filepath.endsWith("ogg")) {
-                    mediaType = "audio/ogg";
-                } else if (filepath.endsWith("oga")) {
-                    mediaType = "audio/ogg";
-                } else if (filepath.endsWith("wav")) {
-                    mediaType = "audio/wav";
-                } else if (filepath.endsWith("flac")) {
-                    mediaType = "audio/flac";
-                }
-
-                const audioElement = document.createElement("audio");
-                audioElement.id = elementId;
-                audioElement.src = data.isUrl ? data.url : resourcePath;
-                if (mediaType) {
-                    audioElement.setAttribute("type", mediaType);
-                }
-
-                // Throw audio element on page.
-                document.getElementById("wrapper").append(audioElement);
-
-                // @ts-ignore
-                audioElement.volume = parseFloat(data.volume) / 10;
-
-                audioElement.oncanplay = () => audioElement.play();
-
-                audioElement.onended = () => {
-                    document.getElementById(elementId).remove();
-                };
-            }
-        }
     }
 };
 
