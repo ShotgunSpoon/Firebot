@@ -604,8 +604,9 @@ async function createMainWindow() {
         })
     );
 
-    // wait for the main window's content to load, then show it
-    mainWindow.webContents.on("did-finish-load", async () => {
+    // wait for the main window's DOM to be ready, then show it
+    // (using dom-ready instead of did-finish-load to avoid waiting for external resources like Font Awesome)
+    mainWindow.webContents.on("dom-ready", async () => {
         createTray(mainWindow);
 
         mainWindow.show();

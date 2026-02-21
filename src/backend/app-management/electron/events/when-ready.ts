@@ -276,6 +276,12 @@ export async function whenReady() {
     // start crowbar relay websocket
     await import("../../../crowbar-relay/crowbar-relay-websocket");
 
+    // Stub removed overlay/visual system handlers (frontend still queries these synchronously via sendSync)
+    const { ipcMain } = await import("electron");
+    ipcMain.on("overlay-widgets:get-all-types", (event) => { event.returnValue = []; });
+    ipcMain.on("overlay-widgets:get-all-configs", (event) => { event.returnValue = []; });
+    ipcMain.on("overlay-widgets:get-state-displays", (event) => { event.returnValue = {}; });
+
     logger.debug("...loading main window");
     windowManagement.updateSplashScreenStatus("Here we go!");
     await windowManagement.createMainWindow();
